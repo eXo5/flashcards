@@ -1,10 +1,12 @@
 var inquirer = require("inquirer");
-var frontCard = function(front,back) {
+var output = require("./clozeCards.txt");
+var flashCard = function(front,back) {
 	this.front = front;
 	this.back = back;
+};
 
- 	this.pickCard = function() {
- 		inquirer.prompt([
+var pickCard = function() {
+ 		this.inquirer.prompt([
  		{
  			type:"list",
  			name: "cardType",
@@ -31,6 +33,7 @@ var frontCard = function(front,back) {
  			}//end else	
  		});//end then function answers
  	}//end pickCard
- };//end frontCard
 
- module.exports = frontCard;
+
+ module.exports = flashCard;
+ 
