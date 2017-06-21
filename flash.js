@@ -1,6 +1,19 @@
+var fs = require("fs");
 var inquirer = require("inquirer");
-var cards = require("./makeCards.js");
+var BasicCard = require("./BasicCard");
+var ClozeCard = require("./ClozeCard.js");
+var basics = require("./basics.json");//basics JSON
+var cards = require("./makeCards.js");//making cards - come back to this
 var argv = process.argv;
+
+var basicCard = new BasicCard("Where is 300 Atrium Drive", "Somerset");
+console.log(basicCard.front, + "\n" + basicCard.back);
+var clozeCard = new ClozeCard("Javascript and Java are both made by Oracle", "Oracle");
+console.log("cc.front " + clozeCard.front);
+
+//console.log((basics.back));
+
+
 inquirer.prompt([
 	{
 		name: "name",
@@ -16,41 +29,24 @@ inquirer.prompt([
 				}]).then(function(answers){
 					if (answers.password == "password") {
 						console.log("Welcome Sir or Madame, please choose below to begin the flashcard creation process.");
-						inquirer.prompt([
-						{
-							type:"list",
-							name:"cardType",
-							choices:["basic", "cloze"],
-							message: "Basic or cloze?"
-						}]).then(function(answers){
-							if (answers.cardType !== "cloze"){
-								inquirer.prompt([{
-									type: "input",
-									name: "question",
-									message: "What will the question be?"
-									}, {
-										type:"input",
-										name: "answer",
-										message:"What will the answer be?"
-									}]).then(function(answers){
-										var flashcard = new cards(answers.question, answers.answer);
-										console.log(flashcard);
-									});
-								
-							}
-						});
-						}
-						
-					
-					else {
-						console.log("Password Invalid");
-					}
-				})
+					cards.pickCard();
 		}
 		else {
 			var loginName = answers.name;
-			console.log(loginName);
+			inquirer.prompt([
+			{
+				type: "input",
+				name: "answer",
+				message: basicCard.front
+			}]).then(function(answers){
+				if (answers.answer == basicCard.back) {
+					console.log("congrats");	
+				}
+			}
+		);
 
 		}
 
 	});	
+}
+});
