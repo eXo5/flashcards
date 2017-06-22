@@ -1,21 +1,29 @@
 var fs = require("fs");
 var inquirer = require("inquirer");
-var BasicCard = require("./BasicCard");
-var ClozeCard = require("./ClozeCard.js");
+var BasicCard = require("./BasicCard.js");
+var clozeJson = require("./ClozeCard.json");
 //var basics = require("./basics.json");//basics JSON
 var cards = require("./makeCards.js");//making cards - come back to this
 var argv = process.argv;
+var ClozeCard = require("./ClozeCard.js");
+var basics = require("./basics.json");
+function clear(){
+	process.stdout.write('\033c');
+}
+function clearScreen(){
+	console.log("Awesome!!");
+	setTimeout(clear, 4000);
+	setTimeout(start,4100)
+}; // clear the screen after 4 seconds
 
-var basicCard = new BasicCard("Where is 300 Atrium Drive", "Somerset");
-//console.log(basicCard.front + "\n" + basicCard.back);
-var clozeCard = new ClozeCard("Javascript and Java are both made by Oracle", "Oracle");
-console.log("cc.front " + clozeCard.front);
-//var cloze2Card = new ClozeCard("Javascript is harder than English", "English");
-//console.log("cc2.front " + cloze2card.front);
+process.stdout.write('\033c');
 
-//console.log((basics.back));
+var start = exports.start = function(){ //lolwat that worked!
 
-console.log("Welcome to flash");
+console.log("Welcome to flash");//Welcome Message
+var count = 0;
+var rightCount = 0;
+var loginName = "";
 inquirer.prompt([
 {
 	name: "name",
@@ -30,7 +38,7 @@ inquirer.prompt([
 				message: "Please enter your password"
 			}]).then(function(answers){
 				if (answers.password == "password") {
-					console.log("Welcome Sir or Madame, please choose below to begin the flashcard creation process.");
+					console.log("Please choose below to begin the flashcard creation process.");
 				cards.pickCard();
 						}
 				})
@@ -38,39 +46,105 @@ inquirer.prompt([
 		else if (answers.name !== "admin") {
 		var loginName = answers.name;
 		process.stdout.write('\033c'); // clear the screen
-		console.log("Welcome to the FlashderDome \n");
+		console.log("Welcome to the ThunderDome \n");
 		inquirer.prompt([
 		{
 			type: "list",
 			name: "type",
 			choices: ["Basic", "Cloze"],
 			default: "Basic",
-			message: "Basic or Cloze type FlashCards?"
+			message: "How would you like to test your 'luck'?"
 		}]).then(function(answers){
 			if (answers.type == "Cloze") {
+			function askCloze(){
+				if (count < clozeJson.cards.length){
 				inquirer.prompt([{
 				type: "input",
 				name: "answer",
-				message: clozeCard.front
+				message: clozeJson.cards[count].front
 			}]).then(function(answers){
-				if (clozeCard.back == answers.answer.toLowerCase()){
-					console.log("Congrats!");
+				if (clozeJson.cards[count].partial.toLowerCase() == answers.answer.toLowerCase()){
+					console.log("Congrats!")
+					rightCount++;
+					count++;
+					askCloze();
+				} else {
+					console.log("Sorry!\nThe correct answer was: " + clozeJson.cards[count].text);
+					count++;
+					askCloze();
 				}
 
 			})
-		}//end clozetest
-		else inquirer.prompt([{
+			}//end count < clozeJson.cards.length
+			if (count >= clozeJson.cards.length){
+				console.log("Congratulations, You've finished!\n" + loginName + " got " + rightCount + " correct!");
+				inquirer.prompt([
+				{
+					type:"list",
+					name:"playAgain",
+					choices: ["Yes", "No"],
+					message: "Would you like to play again?"
+				}]).then(function(answers){
+					if (answers.playAgain == "Yes") {
+						clearScreen();
+					}
+					else {
+						console.log("Have a good day!");
+					}
+				})
+
+			}
+		}//end if cloze
+		askCloze();
+	}//end if == cloze
+			
+		//end clozetest
+			else {
+				
+		function askBasic(){
+		if (count < basics.cards.length) {
+			inquirer.prompt([{
 				type: "input",
 				name: "answer",
-				message: basicCard.front
+				message: basics.cards[count].front
 			}]).then(function(answers){
-				if (answers.answer.toLowerCase() == basicCard.back.toLowerCase()) {
+				if (answers.answer.toLowerCase() == basics.cards[count].back.toLowerCase()) {
 					console.log("congrats");	
+					count++;
+					askBasic();
+				}
+				else {
+					console.log("Sorry!\nThe correct answer is: " + basics.cards[count].back);
+					count++;
+					askBasic();
 				}
 			})
-	})
+			}
+				if (count >= basics.cards.length) {				 
+				console.log("Congratulations You've finished!");
+				inquirer.prompt([
+				{
+					type:"list",
+					name:"playAgain",
+					choices: ["Yes", "No"],
+					message: "Would you like to play again?"
+				}]).then(function(answers){
+					if (answers.playAgain == "Yes") {
+						clearScreen();
+					}
+					else {
+						console.log("Have a good day!");
+					}
+				})
+				}
+		}
+	askBasic();
+	}//end else
+		})
 
-	}
+		}
 	});
-	
+	};
+
+	start();
 

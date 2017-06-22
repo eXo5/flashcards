@@ -1,30 +1,37 @@
 var fs = require("fs");
+var start = require("./flash.js");
 var inquirer = require("inquirer");
+var BasicCard = require("./BasicCard.js");
 var ClozeCard = require("./ClozeCard.js");
+var basicObj = {"cards": []};
 var clozeObj = {"cards": []};
+function clear(){process.stdout.write('\033c'); }
+function clearscreen(){setTimeout(clear, 4000);setTimeout(start.start,4100)}; // clear the screen after 4 seconds
+fs.readFile("./basics.json", function(err, data){
+if(err){
+	console.log(err);
+};
+var parseBasic = JSON.parse(data);
+for (var i = 0; i < parseBasic.cards.length; i++){
+	basicObj.cards.push(parseBasic.cards[i]);
+//console.log("1 " + JSON.stringify(basicObj.cards[i]))//All of these console.logs from the readFile's console.log on initial execution, so they've been commented out, but for the most part they indicate where I ran into trouble..
+	}
+//console.log("basicJSON " + JSON.stringify(basicObj.cards));
+})
+
+
 fs.readFile("./ClozeCard.json", function(err, data){
 				if(err) {
 					console.log(err);
 				};
 				var parseData = JSON.parse(data);
 				//console.log("bs: " + JSON.stringify(parseData));
-				console.log("1" + parseData.cards);
 				for (var i = 0; i < parseData.cards.length; i++){
 					clozeObj.cards.push(parseData.cards[i]);
-					console.log("2" + JSON.stringify(clozeObj.cards[i]));	
+					//console.log("2" + JSON.stringify(clozeObj.cards[i]));	
 				};
-							console.log(clozeObj.cards);
-				//clozeCards.push(JSON.stringify(data));
+					//console.log("3" + clozeObj.cards);
 				});
-
-//var clozedCardArr = clozeCards.push(readCloze);
-//console.log(clozedCarArr[0]);
-//var basicOutput = require("./basics.JSON");
-//var clozeOutput = require("./clozeCards.JSON");
-var flashCard = function(front,back) {
-	this.front = front;
-	this.back = back;
-};
 
 exports.pickCard = function() {
  		inquirer.prompt([
@@ -47,14 +54,33 @@ exports.pickCard = function() {
  						message:"What will the back of your flashcard say?"
  					}]).then(function(answers){
  						
- 						var basicCard = new flashCard(answers.front, answers.back);
+ 						var basicCard = new BasicCard(answers.front, answers.back);
+ 						console.log("One down!\n");
+ 						basicObj.cards.push(basicCard);
  						//var x = fs.readFile(basics.JSON);
  						//x.push(basiccard);trying to use an array somehow//
- 						fs.appendFile("basics.json", basicCard, function(err){if (err)console.log(err);
-						console.log(JSON.stringify(basicCard) + " added to basics.json");
+ 						console.log(JSON.stringify(basicCard) + " added to basics.json!\n");
+ 						fs.writeFile("basics.json", JSON.stringify(basicObj), "utf8", function(err){if (err)console.log(err);
+						
 										});
+ 						inquirer.prompt([
+ 						{
+ 							type: "list",
+ 							name: "more",
+ 							choices: ["Yes", "No"],
+ 							default: "No",
+ 							message: "Would you like to make another flash card?"
+ 						}]).then(function(answers){
+ 							if (answers.more !== "No"){
+ 								makeBasic();
+ 							}
+ 							else if (answers.more == "No"){
 
- 				
+ 							console.log("You can always make more later!");
+ 							clearscreen(); //4 seconds, clear the screen
+ 							
+ 							}
+ 						})
  				});//end basic
  				};
 
@@ -76,11 +102,31 @@ exports.pickCard = function() {
  						//clozeCards.push(readCloze);
 						
  						var clozeCard = new ClozeCard(answers.fullText, answers.clozeText);
- 						
+ 						console.log("One Down!\n" + JSON.stringify(clozeCard) + " added to ClozeCard.json!\n");
 						clozeObj.cards.push(clozeCard);
 						
-						console.log(clozeObj.cards);
-						fs.writeFile("ClozeCard.json", JSON.stringify(clozeObj), "utf8", function(err){if(err){console.log("err " + err)} console.log("One Down!");});
+						//console.log(clozeObj.cards); for some reason this.partialArr writes to the console one characters at a time...
+						fs.writeFile("ClozeCard.json", JSON.stringify(clozeObj), "utf8", function(err) {
+							if(err) {
+								console.log("err " + err);
+								} 
+							});
+						inquirer.prompt([
+						{
+							type: "list",
+							name: "more",
+							choices: ["Yes", "No"],
+							default: ["No"],
+							message: "Would you like to make another card?"
+						}]).then(function(answers){
+							if (answers.more !== "No"){
+								makeCloze();
+							}
+							else if (answers.more == "No") {
+							console.log("You can always make more later!\n");
+							clearscreen(); //4 seconds, clear the screen
+							}
+						});
  					}
  				);//end Cloze
  				};
