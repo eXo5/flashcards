@@ -1,0 +1,4 @@
+flash.js starts the CLI flashcard game/generator/project. ClozeCard.js and BasicCard.js are exportable constructors with respective json files for storing the flashcards as objects inside of an object with a property of cards whose property value is an array.
+
+Points of interest that came up: 
+Writing everything to arrays was not as easy as I thought. I ended up stringifying too many times and ending up with extra characters that just kept getting added everytime it was rewritten. (I pull the array and writeFile for each card added.). This whole thing was harder than I anticipated it would be when I started it, but that's how it usually goes.

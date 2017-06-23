@@ -56,13 +56,14 @@ exports.pickCard = function() {
  						
  						var basicCard = new BasicCard(answers.front, answers.back);
  						console.log("One down!\n");
- 						basicObj.cards.push(basicCard);
- 						//var x = fs.readFile(basics.JSON);
- 						//x.push(basiccard);trying to use an array somehow//
- 						console.log(JSON.stringify(basicCard) + " added to basics.json!\n");
- 						fs.writeFile("basics.json", JSON.stringify(basicObj), "utf8", function(err){if (err)console.log(err);
-						
-										});
+ 						BasicCard.prototype.addCard = function() {
+ 							basicObj.cards.push(basicCard); 						
+ 							console.log(JSON.stringify(basicCard) + " added to basics.json!\n");
+ 							fs.writeFile("basics.json", JSON.stringify(basicObj), "utf8", function(err){if (err)console.log(err);
+ 							});
+	 						}
+ 						basicCard.addCard();	
+ 						//end then for makeBasic
  						inquirer.prompt([
  						{
  							type: "list",
@@ -75,12 +76,11 @@ exports.pickCard = function() {
  								makeBasic();
  							}
  							else if (answers.more == "No"){
-
  							console.log("You can always make more later!");
  							clearscreen(); //4 seconds, clear the screen
- 							
  							}
  						})
+
  				});//end basic
  				};
 
@@ -103,14 +103,17 @@ exports.pickCard = function() {
 						
  						var clozeCard = new ClozeCard(answers.fullText, answers.clozeText);
  						console.log("One Down!\n" + JSON.stringify(clozeCard) + " added to ClozeCard.json!\n");
-						clozeObj.cards.push(clozeCard);
+ 						ClozeCard.prototype.addCard = function(){
+								clozeObj.cards.push(clozeCard);					
+								//this had to be nested in here because clozeCard was defined here.
+								fs.writeFile("ClozeCard.json", JSON.stringify(clozeObj), "utf8", function(err) {
+									if(err) {
+										console.log("err " + err);
+										} 
+									});
+							};
+ 						clozeCard.addCard();
 						
-						//console.log(clozeObj.cards); for some reason this.partialArr writes to the console one characters at a time...
-						fs.writeFile("ClozeCard.json", JSON.stringify(clozeObj), "utf8", function(err) {
-							if(err) {
-								console.log("err " + err);
-								} 
-							});
 						inquirer.prompt([
 						{
 							type: "list",
