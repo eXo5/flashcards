@@ -51,11 +51,11 @@ inquirer.prompt([
 		{
 			type: "list",
 			name: "type",
-			choices: ["Basic", "Cloze"],
+			choices: ["Basic Cards", "Cloze Cards"],
 			default: "Basic",
 			message: "How would you like to test your 'luck'?"
 		}]).then(function(answers){
-			if (answers.type == "Cloze") {
+			if (answers.type == "Cloze Cards") {
 			function askCloze(){
 				if (count < clozeJson.cards.length){
 				inquirer.prompt([{
@@ -64,7 +64,7 @@ inquirer.prompt([
 				message: clozeJson.cards[count].front
 			}]).then(function(answers){
 				if (clozeJson.cards[count].partial.toLowerCase() == answers.answer.toLowerCase()){
-					console.log("Congrats!")
+					console.log("Good Job!!")
 					rightCount++;
 					count++;
 					askCloze();
@@ -109,8 +109,9 @@ inquirer.prompt([
 				message: basics.cards[count].front
 			}]).then(function(answers){
 				if (answers.answer.toLowerCase() == basics.cards[count].back.toLowerCase()) {
-					console.log("congrats");	
+					console.log("Good Job!");	
 					count++;
+					rightCount++;
 					askBasic();
 				}
 				else {
@@ -121,7 +122,7 @@ inquirer.prompt([
 			})
 			}
 				if (count >= basics.cards.length) {				 
-				console.log("Congratulations You've finished!");
+				console.log("\n" + loginName + "got " + rightCount + " questions right!");
 				inquirer.prompt([
 				{
 					type:"list",
